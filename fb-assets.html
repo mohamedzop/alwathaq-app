@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>صور صفحة الفيسبوك — الوثاق للصرافة</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Markazi+Text:wght@600;700&family=Cairo:wght@400;600;700&display=swap');
+
+  body{
+    font-family:'Cairo', sans-serif;
+    background:#e9e5da;
+    margin:0;
+    padding:40px 20px 80px;
+    color:#20221f;
+    direction:rtl;
+  }
+  h1{ text-align:center; font-family:'Markazi Text', serif; font-size:30px; margin-bottom:6px;}
+  p.instructions{ text-align:center; color:#555; max-width:640px; margin:0 auto 40px; font-size:15px; line-height:1.8;}
+  .canvas-block{ margin:0 auto 60px; max-width:fit-content; text-align:center; }
+  .canvas-block h2{ font-family:'Markazi Text', serif; font-size:22px; margin-bottom:16px; }
+  canvas{ max-width:100%; height:auto; border:1px solid #d9d2bf; display:block; margin:0 auto; }
+  #profile-canvas{ width:340px; }
+  #cover-canvas{ width:780px; }
+  button.dl{
+    margin-top:18px;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    background:#c9a54f;
+    color:#0c2e2f;
+    border:none;
+    padding:14px 30px;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  button.dl:hover{ background:#b08d3f; }
+  .status{ margin-top:10px; font-size:13.5px; color:#777; min-height:18px; }
+</style>
+</head>
+<body>
+
+<h1>صور صفحة الفيسبوك</h1>
+<p class="instructions">
+  انتظر لحد ما تظهر الصورتين تحت بشكل صحيح (يأخذ ثانية وحدة لتحميل الخط)، بعدين اضغط "تحميل الصورة" تحت كل وحدة.
+</p>
+
+<div class="canvas-block">
+  <h2>صورة البروفايل (720×720)</h2>
+  <canvas id="profile-canvas" width="720" height="720"></canvas>
+  <div><button class="dl" onclick="downloadCanvas('profile-canvas','صورة-البروفايل-الوثاق.png')">تحميل الصورة</button></div>
+  <div class="status" id="status-profile"></div>
+</div>
+
+<div class="canvas-block">
+  <h2>صورة الغلاف (1640×624)</h2>
+  <canvas id="cover-canvas" width="1640" height="624"></canvas>
+  <div><button class="dl" onclick="downloadCanvas('cover-canvas','صورة-الغلاف-الوثاق.png')">تحميل الصورة</button></div>
+  <div class="status" id="status-cover"></div>
+</div>
+
+<script>
+const COLORS = {
+  teal950: '#0c2e2f',
+  teal900: '#0f3d3e',
+  gold: '#b08d3f',
+  goldBright: '#c9a54f',
+  paperDim: '#cfd2cb'
+};
+
+function drawRings(ctx, cx, cy, r, lineWidth, color){
+  const gap = r * 0.62;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.beginPath();
+  ctx.arc(cx - gap, cy, r, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx + gap, cy, r, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+// Shrink font size until the text fits maxWidth, return the font string used
+function fitText(ctx, text, family, weight, maxSize, minSize, maxWidth){
+  let size = maxSize;
+  while (size > minSize){
+    ctx.font = `${weight} ${size}px "${family}"`;
+    if (ctx.measureText(text).width <= maxWidth) break;
+    size -= 2;
+  }
+  return size;
+}
+
+function drawProfilePic(){
+  const canvas = document.getElementById('profile-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const grad = ctx.createRadialGradient(W*0.35, H*0.3, 40, W*0.5, H*0.5, W*0.75);
+  grad.addColorStop(0, '#124a4a');
+  grad.addColorStop(1, COLORS.teal950);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.strokeStyle = 'rgba(201,165,79,.35)';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(W/2, H/2, W/2 - 30, 0, Math.PI*2);
+  ctx.stroke();
+
+  drawRings(ctx, W/2, H/2, 95, 22, COLORS.goldBright);
+
+  document.getElementById('status-profile').textContent = 'جاهزة ✓';
+}
+
+function drawCoverPhoto(){
+  const canvas = document.getElementById('cover-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const rightMargin = 90;
+
+  // background
+  ctx.fillStyle = COLORS.teal950;
+  ctx.fillRect(0, 0, W, H);
+  const rg = ctx.createRadialGradient(W*0.85, 0, 50, W*0.85, 0, 700);
+  rg.addColorStop(0, 'rgba(201,165,79,.14)');
+  rg.addColorStop(1, 'rgba(201,165,79,0)');
+  ctx.fillStyle = rg;
+  ctx.fillRect(0, 0, W, H);
+
+  // faint watermark rings, bottom-left
+  ctx.save();
+  ctx.globalAlpha = 0.07;
+  drawRings(ctx, 120, H - 60, 150, 14, COLORS.goldBright);
+  ctx.restore();
+
+  // gold bottom bar
+  const barGrad = ctx.createLinearGradient(0, 0, W, 0);
+  barGrad.addColorStop(0, COLORS.gold);
+  barGrad.addColorStop(1, COLORS.goldBright);
+  ctx.fillStyle = barGrad;
+  ctx.fillRect(0, H - 8, W, 8);
+
+  // icon (top row)
+  const iconCy = 168;
+  const iconR = 30;
+  const iconCx = W - rightMargin - iconR - 8;
+  drawRings(ctx, iconCx, iconCy, iconR, 9, COLORS.goldBright);
+
+  // wordmark text (right-anchored, to the left of the icon)
+  ctx.direction = 'rtl';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  const wordmarkRightEdge = iconCx - iconR - 26;
+  ctx.font = '700 74px "Markazi Text"';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('الوثاق للصرافة', wordmarkRightEdge, iconCy + 8);
+
+  // tagline
+  const rightEdge = W - rightMargin;
+  ctx.font = '600 32px "Cairo"';
+  ctx.fillStyle = COLORS.goldBright;
+  ctx.fillText('صرافة وحوالات تثق بها في كل معاملة', rightEdge, 266);
+
+  // services line (auto-fit width)
+  const servicesText = 'صرف عملات  •  حوالات محلية ودولية  •  حوالات تركيا ودبي  •  شحن فودافون كاش  •  خدمة 24 ساعة';
+  const maxServicesWidth = W - rightMargin * 2;
+  const fitSize = fitText(ctx, servicesText, 'Cairo', '400', 24, 15, maxServicesWidth);
+  ctx.font = `400 ${fitSize}px "Cairo"`;
+  ctx.fillStyle = COLORS.paperDim;
+  ctx.fillText(servicesText, rightEdge, 320);
+
+  document.getElementById('status-cover').textContent = 'جاهزة ✓';
+}
+
+function downloadCanvas(id, filename){
+  const canvas = document.getElementById(id);
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// Wait for the actual fonts (with correct weights) to finish loading before drawing
+Promise.all([
+  document.fonts.load('700 74px "Markazi Text"'),
+  document.fonts.load('600 32px "Cairo"'),
+  document.fonts.load('400 24px "Cairo"'),
+  document.fonts.load('600 24px "Cairo"')
+]).then(() => {
+  drawProfilePic();
+  drawCoverPhoto();
+}).catch(() => {
+  // Draw anyway after a short delay even if the Font Loading API had an issue
+  setTimeout(() => { drawProfilePic(); drawCoverPhoto(); }, 800);
+});
+</script>
+</body>
+</html>

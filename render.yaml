@@ -1,0 +1,26 @@
+# Render Blueprint — انشر «الوثاق للصرافة» بضغطة زر
+# طريقة الاستخدام:
+#   1. ارفع مجلد alwathaq-site إلى مستودع GitHub.
+#   2. في Render: New > Blueprint، واختر المستودع. سيقرأ هذا الملف تلقائياً.
+#      (أو: New Web Service واربط المستودع مباشرة — استخدم الأوامر أدناه.)
+#
+# التكوين الدائم: قرص بمسار /data لحفظ قاعدة البيانات (لا تضيع عند إعادة النشر).
+services:
+  - type: web
+    name: alwathaq
+    runtime: node
+    plan: starter
+    healthCheckPath: /api/health
+    buildCommand: ""            # لا اعتماديات — لا حاجة لـ npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # مسار قاعدة البيانات داخل القرص الدائم (مهم — لا تخزّنها داخل الكود)
+      - key: DB_PATH
+        value: /data/alwathaq.db
+      # Render يحقن PORT تلقائياً — لا تحددها هنا
+    disk:
+      name: alwathaq-data
+      mountPath: /data
+      sizeGB: 1

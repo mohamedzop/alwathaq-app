@@ -1,0 +1,16 @@
+{
+  "name": "alwathaq-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "الوثاق للصرافة — الموقع العام + بوابة الموظفين الداخلية + قاعدة البيانات (تطبيق واحد)",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "db:reset": "node server.js --reset-db"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {}
+}
